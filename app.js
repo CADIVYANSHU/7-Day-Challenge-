@@ -11,7 +11,7 @@ function notice(msg,bad=false){$("notice").textContent=msg;$("notice").className
 function setAuthMessage(msg,bad=false){$("authMsg").textContent=msg;$("authMsg").className=bad?"error":"muted"}
 function showApp(s){session=s;const valid=s?.user?.email?.toLowerCase()===OWNER;$("auth").classList.toggle("hidden",valid);$("app").classList.toggle("hidden",!valid);if(valid)load().catch(e=>notice(e.message,true));else if(s)setAuthMessage("This account is not authorized for this challenge.",true)}
 async function load(){const [u,c]=await Promise.all([db.from("check_ins").select("*").order("challenge_date"),db.from("consumption_logs").select("*").order("challenge_date",{ascending:false}).order("consumed_time",{ascending:false})]);if(u.error)throw u.error;if(c.error)throw c.error;checkins=u.data||[];consumption=c.data||[];render()}
-function render(){const now=today(),day=now>=START&&now<=END?DAYS-(END.slice(-2)-now.slice(-2)):null;
+function render(){const now=today(),day=now>=START&&now<=END?Math.floor((Date.parse(now+"T00:00:00Z")-Date.parse(START+"T00:00:00Z"))/86400000)+1:null;
 $("todayTitle").textContent=new Date().toLocaleDateString("en-IN",{timeZone:"Asia/Kolkata",day:"numeric",month:"long",year:"numeric"});
 $("dayBadge").textContent=day?"DAY "+day+" / 7":now<START?"STARTS 29 SEP":"CHALLENGE COMPLETE";
 $("updates").textContent=checkins.filter(c=>c.challenge_date===now).length+"/3";
